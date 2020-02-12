@@ -1,1 +1,3 @@
+mod codec;
+
 fn main() {}
