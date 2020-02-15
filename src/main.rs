@@ -1,3 +1,5 @@
+mod packet;
+
 use bytes::Bytes;
 use log::{debug, info, log_enabled, trace, Level};
 use tokio::net::UdpSocket;
