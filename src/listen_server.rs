@@ -40,13 +40,9 @@ impl ListenServer {
                 }
             };
 
-            match packet {
-                GoldSrcPacket::A2sInfoRequest => {
-                    info!("Info request from {}", client_addr);
-                    let response = remote_server.request_info().await?;
-                    self.socket.send_to(&response, client_addr).await?;
-                }
-            }
+            info!("{:?} request from {}", packet, client_addr);
+            let response = remote_server.request(packet).await?;
+            self.socket.send_to(&response, client_addr).await?;
         }
     }
 }

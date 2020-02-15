@@ -1,8 +1,7 @@
 use std::io;
 use tokio::net::{ToSocketAddrs, UdpSocket};
 use log::debug;
-
-const A2S_INFO_REQUEST: &[u8] = b"\xff\xff\xff\xffTSource Engine Query\0";
+use crate::packet::GoldSrcPacket;
 
 pub(crate) struct RemoteServer {
     socket: UdpSocket,
@@ -16,9 +15,9 @@ impl RemoteServer {
         Ok(RemoteServer { socket })
     }
 
-    pub(crate) async fn request_info(&mut self) -> io::Result<Vec<u8>> {
+    pub(crate) async fn request(&mut self, item: GoldSrcPacket) -> io::Result<Vec<u8>> {
         debug!("Requesting info update from remote server");
-        self.socket.send(A2S_INFO_REQUEST).await?;
+        self.socket.send(item.as_ref()).await?;
 
         let mut buf = [0; 1024];
         let bytes_read = self.socket.recv(&mut buf).await?;

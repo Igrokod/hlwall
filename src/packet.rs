@@ -1,14 +1,15 @@
 use byteorder::{ByteOrder, LittleEndian};
 use std::convert::TryFrom;
+use std::convert::AsRef;
+
+const SINGLE_PACKET: i32 = -1;
+const A2S_INFO_REQUEST_KIND: u8 = b'T';
+const A2S_INFO_REQUEST: &[u8] = b"\xff\xff\xff\xffTSource Engine Query\0";
 
 #[derive(Debug)]
 pub(crate) enum GoldSrcPacket {
     A2sInfoRequest,
 }
-
-const SINGLE_PACKET: i32 = -1;
-
-const A2S_INFO_REQUEST: u8 = b'T';
 
 #[derive(thiserror::Error, Debug)]
 pub enum PacketParseError {
@@ -35,8 +36,17 @@ impl TryFrom<&[u8]> for GoldSrcPacket {
 
         let request_kind = body[4];
         match request_kind {
-            A2S_INFO_REQUEST => Ok(GoldSrcPacket::A2sInfoRequest),
+            A2S_INFO_REQUEST_KIND => Ok(GoldSrcPacket::A2sInfoRequest),
             _ => Err(PacketParseError::UnsupportedPacketType(request_kind)),
+        }
+    }
+}
+
+impl AsRef<[u8]> for GoldSrcPacket {
+    #[inline]
+    fn as_ref(&self) -> &[u8] {
+        match self {
+            GoldSrcPacket::A2sInfoRequest => A2S_INFO_REQUEST
         }
     }
 }
