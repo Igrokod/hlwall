@@ -3,3 +3,9 @@ name = "hlwall"
 version = "0.0.1"
 authors = ["Fedcomp"]
 edition = "2018"
+
+[dependencies]
+tokio = { version = "0.2.11", features = ["full"] }
+log = "0.4.8"
+env_logger = "0.7.1"
+bytes = "0.5.4"
