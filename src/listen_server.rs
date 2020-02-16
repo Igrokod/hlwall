@@ -1,10 +1,10 @@
+use crate::caching_server::CachingServer;
+use crate::packet::GoldSrcPacket;
 use bytes::Bytes;
 use log::{info, log_enabled, trace, warn, Level};
 use std::convert::TryFrom;
 use std::io;
 use tokio::net::{ToSocketAddrs, UdpSocket};
-use crate::packet::GoldSrcPacket;
-use crate::remote_server::RemoteServer;
 
 pub(crate) struct ListenServer {
     socket: UdpSocket,
@@ -16,7 +16,7 @@ impl ListenServer {
         Ok(ListenServer { socket })
     }
 
-    pub(crate) async fn serve(mut self, mut remote_server: RemoteServer) -> anyhow::Result<()> {
+    pub(crate) async fn serve(mut self, mut remote_server: CachingServer) -> anyhow::Result<()> {
         loop {
             let mut buf = [0u8; 1024];
             let (bytes_read, client_addr) = self.socket.recv_from(&mut buf).await?;

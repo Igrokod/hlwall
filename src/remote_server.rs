@@ -1,7 +1,7 @@
+use crate::packet::GoldSrcPacket;
+use log::debug;
 use std::io;
 use tokio::net::{ToSocketAddrs, UdpSocket};
-use log::debug;
-use crate::packet::GoldSrcPacket;
 
 pub(crate) struct RemoteServer {
     socket: UdpSocket,
@@ -15,7 +15,7 @@ impl RemoteServer {
         Ok(RemoteServer { socket })
     }
 
-    pub(crate) async fn request(&mut self, item: GoldSrcPacket) -> io::Result<Vec<u8>> {
+    pub(crate) async fn request(&mut self, item: &GoldSrcPacket) -> io::Result<Vec<u8>> {
         debug!("Requesting info update from remote server");
         self.socket.send(item.as_ref()).await?;
 

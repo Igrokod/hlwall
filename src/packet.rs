@@ -1,12 +1,12 @@
 use byteorder::{ByteOrder, LittleEndian};
-use std::convert::TryFrom;
 use std::convert::AsRef;
+use std::convert::TryFrom;
 
 const SINGLE_PACKET: i32 = -1;
 const A2S_INFO_REQUEST_KIND: u8 = b'T';
 const A2S_INFO_REQUEST: &[u8] = b"\xff\xff\xff\xffTSource Engine Query\0";
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Eq, Hash)]
 pub(crate) enum GoldSrcPacket {
     A2sInfoRequest,
 }
@@ -46,7 +46,7 @@ impl AsRef<[u8]> for GoldSrcPacket {
     #[inline]
     fn as_ref(&self) -> &[u8] {
         match self {
-            GoldSrcPacket::A2sInfoRequest => A2S_INFO_REQUEST
+            GoldSrcPacket::A2sInfoRequest => A2S_INFO_REQUEST,
         }
     }
 }
