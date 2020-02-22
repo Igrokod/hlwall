@@ -39,7 +39,7 @@ impl ListenServer {
                 trace!(
                     "From {} received: {:?} (truncated to packet max inspected size of {})",
                     client_addr,
-                    Bytes::from(raw_packet.to_owned()),
+                    Bytes::copy_from_slice(raw_packet),
                     MAX_INSPECTED_SIZE
                 );
             }
@@ -63,7 +63,7 @@ impl ListenServer {
                     "Sending {:?} response to {}, contents: {:?}",
                     packet,
                     client_addr,
-                    Bytes::from(response.clone())
+                    Bytes::copy_from_slice(&response)
                 )
             }
 
