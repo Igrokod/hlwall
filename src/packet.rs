@@ -15,8 +15,8 @@ pub(crate) enum GoldSrcPacket {
 pub enum PacketParseError {
     #[error("Mailformed packet")]
     MailformedPacket,
-    #[error("Unsupported packet split status. Only single packets are supported")]
-    UnsupportedSplitStatus,
+    #[error("Unsupported packet split status ({0:x}). Only single packets are supported")]
+    UnsupportedSplitStatus(i32),
     #[error("Unsupported packet type: {0:x}")]
     UnsupportedPacketType(u8),
 }
@@ -31,7 +31,9 @@ impl TryFrom<&[u8]> for GoldSrcPacket {
 
         let packet_split_status = LittleEndian::read_i32(&body[0..4]);
         if packet_split_status != SINGLE_PACKET {
-            return Err(PacketParseError::UnsupportedSplitStatus);
+            return Err(PacketParseError::UnsupportedSplitStatus(
+                packet_split_status,
+            ));
         }
 
         let request_kind = body[4];
