@@ -1,9 +1,9 @@
 use crate::packet::GoldSrcPacket;
+use bytes::Bytes;
 use log::debug;
+use log::{log_enabled, trace, Level};
 use std::io;
 use tokio::net::{ToSocketAddrs, UdpSocket};
-use bytes::Bytes;
-use log::{log_enabled, trace, Level};
 
 pub(crate) struct RemoteServer {
     socket: UdpSocket,
