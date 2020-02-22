@@ -1,4 +1,13 @@
-hlds:
-  build: docker/hlds
-  ports:
-    - 27015:27015/udp
+version: '3'
+services:
+  hlds:
+    build: docker/hlds
+    ports:
+      - 27015:27015/udp
+
+  hlwall:
+    build:
+      context: .
+      dockerfile: docker/hlwall/Dockerfile
+    depends_on:
+      - hlds
