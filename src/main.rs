@@ -10,7 +10,7 @@ use std::time::Duration;
 
 const CACHE_REQUESTS_FOR: u64 = 3;
 
-#[tokio::main]
+#[tokio::main(basic_scheduler)]
 async fn main() -> anyhow::Result<()> {
     env_logger::init();
 
