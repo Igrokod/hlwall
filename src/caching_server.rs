@@ -27,7 +27,7 @@ impl CachingServer {
             None => {
                 let result = self.inner.request(&item)?;
                 self.cache
-                    .insert(item.clone(), result.clone(), self.cache_duration);
+                    .insert(*item, result.clone(), self.cache_duration);
                 Ok(result)
             }
         }

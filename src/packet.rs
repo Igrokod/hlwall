@@ -8,7 +8,7 @@ const SINGLE_PACKET: i32 = -1;
 const A2S_INFO_REQUEST_KIND: u8 = b'T';
 const A2S_INFO_REQUEST: &[u8] = b"\xff\xff\xff\xffTSource Engine Query\0";
 
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[derive(Debug, Copy, Clone, PartialEq, Eq, Hash)]
 pub(crate) enum GoldSrcPacket {
     A2sInfoRequest,
 }
