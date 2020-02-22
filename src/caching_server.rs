@@ -20,12 +20,12 @@ impl CachingServer {
         }
     }
 
-    pub(crate) async fn request(&mut self, item: &GoldSrcPacket) -> io::Result<Vec<u8>> {
+    pub(crate) fn request(&mut self, item: &GoldSrcPacket) -> io::Result<Vec<u8>> {
         match self.cache.get(&item) {
             Some(v) => Ok(v.to_owned()),
             // Cache miss
             None => {
-                let result = self.inner.request(&item).await?;
+                let result = self.inner.request(&item)?;
                 self.cache
                     .insert(item.clone(), result.clone(), self.cache_duration);
                 Ok(result)

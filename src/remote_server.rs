@@ -3,26 +3,26 @@ use bytes::Bytes;
 use log::debug;
 use log::{log_enabled, trace, Level};
 use std::io;
-use tokio::net::{ToSocketAddrs, UdpSocket};
+use std::net::{ToSocketAddrs, UdpSocket};
 
 pub(crate) struct RemoteServer {
     socket: UdpSocket,
 }
 
 impl RemoteServer {
-    pub(crate) async fn connect<A: ToSocketAddrs>(addr: A) -> io::Result<Self> {
-        let socket = UdpSocket::bind("0.0.0.0:0").await?;
-        socket.connect(addr).await?;
+    pub(crate) fn connect<A: ToSocketAddrs>(addr: A) -> io::Result<Self> {
+        let socket = UdpSocket::bind("0.0.0.0:0")?;
+        socket.connect(addr)?;
 
         Ok(RemoteServer { socket })
     }
 
-    pub(crate) async fn request(&mut self, item: &GoldSrcPacket) -> io::Result<Vec<u8>> {
+    pub(crate) fn request(&mut self, item: &GoldSrcPacket) -> io::Result<Vec<u8>> {
         debug!("Requesting info update from remote server");
-        self.socket.send(item.as_ref()).await?;
+        self.socket.send(item.as_ref())?;
 
         let mut buf = [0; 1024];
-        let bytes_read = self.socket.recv(&mut buf).await?;
+        let bytes_read = self.socket.recv(&mut buf)?;
         let received_buf = (&buf[0..bytes_read]).to_owned();
 
         if log_enabled!(Level::Trace) {

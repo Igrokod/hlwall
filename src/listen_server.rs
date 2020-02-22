@@ -5,7 +5,7 @@ use bytes::Bytes;
 use log::{info, log_enabled, trace, warn, Level};
 use std::convert::TryFrom;
 use std::io;
-use tokio::net::{ToSocketAddrs, UdpSocket};
+use std::net::{ToSocketAddrs, UdpSocket};
 
 pub(crate) struct ListenServer {
     socket: UdpSocket,
@@ -13,25 +13,24 @@ pub(crate) struct ListenServer {
 }
 
 impl ListenServer {
-    pub(crate) async fn bind<A: ToSocketAddrs>(
+    pub(crate) fn bind<A: ToSocketAddrs>(
         addr: A,
         remote_server: CachingServer,
     ) -> io::Result<Self> {
-        let socket = UdpSocket::bind(addr).await?;
+        let socket = UdpSocket::bind(addr)?;
         Ok(ListenServer {
             socket,
             remote_server,
         })
     }
 
-    pub(crate) async fn serve(mut self) -> anyhow::Result<()> {
+    pub(crate) fn serve(mut self) -> anyhow::Result<()> {
         let mut buf = [0u8; MAX_INSPECTED_SIZE];
 
         loop {
             let (bytes_read, client_addr) = self
                 .socket
                 .recv_from(&mut buf)
-                .await
                 .with_context(|| "Failed to read next udp request")?;
 
             let raw_packet = &buf[0..bytes_read];
@@ -57,7 +56,7 @@ impl ListenServer {
             };
 
             info!("{:?} request from {}", packet, client_addr);
-            let response = self.remote_server.request(&packet).await?;
+            let response = self.remote_server.request(&packet)?;
 
             if log_enabled!(Level::Trace) {
                 trace!(
@@ -68,7 +67,7 @@ impl ListenServer {
                 )
             }
 
-            self.socket.send_to(&response, client_addr).await?;
+            self.socket.send_to(&response, client_addr)?;
         }
     }
 }
