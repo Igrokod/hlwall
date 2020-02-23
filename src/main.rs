@@ -8,18 +8,33 @@ use caching_server::CachingServer;
 use listen_server::ListenServer;
 use remote_server::RemoteServer;
 use std::time::Duration;
+use structopt::StructOpt;
 
-const CACHE_REQUESTS_FOR: u64 = 3;
+#[derive(Debug, StructOpt)]
+#[structopt(about = env!("CARGO_PKG_DESCRIPTION"))]
+struct Opt {
+    /// Cache expiration in milliseconds
+    #[structopt(short, long, default_value = "200")]
+    ttl: u64,
+
+    /// Interface on which we will listen/answer
+    #[structopt(short, long, default_value = "127.0.0.1:27016")]
+    listen: String,
+
+    /// Target server we cache queries from
+    #[structopt(name = "TARGET_SERVER", default_value = "127.0.0.1:27015")]
+    target: String
+}
 
 fn main() -> anyhow::Result<()> {
     env_logger::init();
 
-    // The target hlds server
-    let remote_server = RemoteServer::connect("127.0.0.1:27015")?;
+    let config = Opt::from_args();
 
-    let cache_duration = Duration::from_secs(CACHE_REQUESTS_FOR);
+    // The target hlds server
+    let remote_server = RemoteServer::connect(config.target)?;
+    let cache_duration = Duration::from_secs(config.ttl);
     let caching_server = CachingServer::new(remote_server, cache_duration);
 
-    let bind_to = "127.0.0.1:27016";
-    ListenServer::bind(bind_to, caching_server)?.serve()
+    ListenServer::bind(config.listen, caching_server)?.serve()
 }
