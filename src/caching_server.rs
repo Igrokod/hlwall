@@ -5,14 +5,14 @@ use std::collections::HashMap;
 use std::io;
 use std::time::Duration;
 
-pub(crate) struct CachingServer {
+pub struct CachingServer {
     cache: HashMap<GoldSrcPacket, Ttl<Vec<u8>>>,
     cache_duration: Duration,
     inner: RemoteServer,
 }
 
 impl CachingServer {
-    pub(crate) fn new(inner: RemoteServer, cache_duration: Duration) -> Self {
+    pub fn new(inner: RemoteServer, cache_duration: Duration) -> Self {
         let mut cache = HashMap::new();
 
         // Insert instant expired items
@@ -29,7 +29,7 @@ impl CachingServer {
         }
     }
 
-    pub(crate) fn request(&mut self, item: &GoldSrcPacket) -> io::Result<Vec<u8>> {
+    pub fn request(&mut self, item: &GoldSrcPacket) -> io::Result<Vec<u8>> {
         let cached_item = self
             .cache
             .get(&item)

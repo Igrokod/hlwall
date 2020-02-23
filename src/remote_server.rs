@@ -5,19 +5,19 @@ use log::{log_enabled, trace, Level};
 use std::io;
 use std::net::{ToSocketAddrs, UdpSocket};
 
-pub(crate) struct RemoteServer {
+pub struct RemoteServer {
     socket: UdpSocket,
 }
 
 impl RemoteServer {
-    pub(crate) fn connect<A: ToSocketAddrs>(addr: A) -> io::Result<Self> {
+    pub fn connect<A: ToSocketAddrs>(addr: A) -> io::Result<Self> {
         let socket = UdpSocket::bind("0.0.0.0:0")?;
         socket.connect(addr)?;
 
         Ok(RemoteServer { socket })
     }
 
-    pub(crate) fn request(&mut self, item: &GoldSrcPacket) -> io::Result<Vec<u8>> {
+    pub fn request(&mut self, item: &GoldSrcPacket) -> io::Result<Vec<u8>> {
         debug!("Requesting info update from remote server");
         self.socket.send(item.as_ref())?;
 

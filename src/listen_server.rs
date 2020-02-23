@@ -7,13 +7,13 @@ use std::convert::TryFrom;
 use std::io;
 use std::net::{ToSocketAddrs, UdpSocket};
 
-pub(crate) struct ListenServer {
+pub struct ListenServer {
     socket: UdpSocket,
     remote_server: CachingServer,
 }
 
 impl ListenServer {
-    pub(crate) fn bind<A: ToSocketAddrs>(
+    pub fn bind<A: ToSocketAddrs>(
         addr: A,
         remote_server: CachingServer,
     ) -> io::Result<Self> {
@@ -24,7 +24,7 @@ impl ListenServer {
         })
     }
 
-    pub(crate) fn serve(mut self) -> anyhow::Result<()> {
+    pub fn serve(mut self) -> anyhow::Result<()> {
         let mut buf = [0u8; MAX_INSPECTED_SIZE];
 
         loop {
