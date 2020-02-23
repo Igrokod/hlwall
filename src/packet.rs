@@ -6,10 +6,10 @@ pub(crate) const MAX_INSPECTED_SIZE: usize = 5; // A2S_INFO header split status 
 
 const SINGLE_PACKET: i32 = -1;
 const A2S_INFO_REQUEST_KIND: u8 = b'T';
-const A2S_INFO_REQUEST: &[u8] = b"\xff\xff\xff\xffTSource Engine Query\0";
+pub const A2S_INFO_REQUEST: &[u8] = b"\xff\xff\xff\xffTSource Engine Query\0";
 
 #[derive(Debug, Copy, Clone, PartialEq, Eq, Hash)]
-pub(crate) enum GoldSrcPacket {
+pub enum GoldSrcPacket {
     A2sInfoRequest,
 }
 
