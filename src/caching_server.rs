@@ -19,7 +19,7 @@ impl CachingServer {
         // for each request kind
         cache.insert(
             GoldSrcPacket::A2sInfoRequest,
-            Ttl::new(vec![], Duration::default()),
+            Ttl::new(vec![], cache_duration),
         );
 
         CachingServer {

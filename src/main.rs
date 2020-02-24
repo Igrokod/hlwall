@@ -27,7 +27,7 @@ fn main() -> anyhow::Result<()> {
 
     // The target hlds server
     let remote_server = RemoteServer::connect(config.target)?;
-    let cache_duration = Duration::from_secs(config.ttl);
+    let cache_duration = Duration::from_millis(config.ttl);
     let caching_server = CachingServer::new(remote_server, cache_duration);
 
     ListenServer::bind(config.listen, caching_server)?.serve()
