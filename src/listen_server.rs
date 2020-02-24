@@ -13,10 +13,7 @@ pub struct ListenServer {
 }
 
 impl ListenServer {
-    pub fn bind<A: ToSocketAddrs>(
-        addr: A,
-        remote_server: CachingServer,
-    ) -> io::Result<Self> {
+    pub fn bind<A: ToSocketAddrs>(addr: A, remote_server: CachingServer) -> io::Result<Self> {
         let socket = UdpSocket::bind(addr)?;
         Ok(ListenServer {
             socket,
@@ -56,18 +53,20 @@ impl ListenServer {
             };
 
             info!("{:?} request from {}", packet, client_addr);
-            let response = self.remote_server.request(&packet)?;
+            let mut response_buf = [0u8; 1024];
+            let bytes_written = self.remote_server.request(&packet, &mut response_buf)?;
+            let packet = &response_buf[0..bytes_written];
 
             if log_enabled!(Level::Trace) {
                 trace!(
                     "Sending {:?} response to {}, contents: {:?}",
                     packet,
                     client_addr,
-                    Bytes::copy_from_slice(&response)
+                    Bytes::copy_from_slice(packet)
                 )
             }
 
-            self.socket.send_to(&response, client_addr)?;
+            self.socket.send_to(&packet, client_addr)?;
         }
     }
 }

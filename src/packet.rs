@@ -1,6 +1,6 @@
 use byteorder::{ByteOrder, LittleEndian};
-use std::convert::AsRef;
 use std::convert::TryFrom;
+use std::io::{self, Cursor, Write};
 
 pub(crate) const MAX_INSPECTED_SIZE: usize = 5; // A2S_INFO header split status + packet kind
 
@@ -21,6 +21,21 @@ pub enum PacketParseError {
     UnsupportedSplitStatus(i32),
     #[error("Unsupported packet type: {0:x}")]
     UnsupportedPacketType(u8),
+}
+
+impl GoldSrcPacket {
+    pub fn serialize(&self, buf: &mut [u8]) -> io::Result<usize> {
+        let mut writer = Cursor::new(buf);
+
+        match *self {
+            GoldSrcPacket::A2sInfoRequest => {
+                writer.write_all(A2S_INFO_REQUEST)?;
+            }
+        };
+
+        // It should never be bigger than u64
+        Ok(writer.position() as usize)
+    }
 }
 
 impl TryFrom<&[u8]> for GoldSrcPacket {
@@ -46,18 +61,9 @@ impl TryFrom<&[u8]> for GoldSrcPacket {
     }
 }
 
-impl AsRef<[u8]> for GoldSrcPacket {
-    #[inline]
-    fn as_ref(&self) -> &[u8] {
-        match self {
-            GoldSrcPacket::A2sInfoRequest => A2S_INFO_REQUEST,
-        }
-    }
-}
-
 #[cfg(test)]
 mod tests {
-    use super::GoldSrcPacket;
+    use super::{GoldSrcPacket, A2S_INFO_REQUEST};
     use std::convert::TryFrom;
 
     #[test]
@@ -78,12 +84,24 @@ mod tests {
     }
 
     #[test]
-    fn test_a2s_info_request() {
-        const A2S_INFO_REQUEST: &[u8] = b"\xff\xff\xff\xffT";
+    fn test_a2s_info_request_parse() {
+        const A2S_SHORT_INFO_REQUEST: &[u8] = b"\xff\xff\xff\xffT";
 
-        match GoldSrcPacket::try_from(A2S_INFO_REQUEST) {
+        match GoldSrcPacket::try_from(A2S_SHORT_INFO_REQUEST) {
             Ok(GoldSrcPacket::A2sInfoRequest) => {}
             other => panic!("A2S_INFO_REQUEST Deserialization fail: {:?}", other),
         }
+    }
+
+    #[test]
+    fn test_a2s_info_request_serialize() {
+        let packet = GoldSrcPacket::A2sInfoRequest;
+        let mut buf = [0u8; 25];
+
+        let bytes_written = packet
+            .serialize(&mut buf)
+            .expect("Failed to serialize A2sInfoRequest");
+        assert_eq!(&buf[0..bytes_written], A2S_INFO_REQUEST);
+        assert_eq!(bytes_written, A2S_INFO_REQUEST.len());
     }
 }

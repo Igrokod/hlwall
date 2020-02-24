@@ -17,21 +17,33 @@ impl RemoteServer {
         Ok(RemoteServer { socket })
     }
 
-    pub fn request(&mut self, item: &GoldSrcPacket) -> io::Result<Vec<u8>> {
+    pub fn request(
+        &mut self,
+        item: &GoldSrcPacket,
+        mut return_buf: &mut [u8],
+    ) -> io::Result<usize> {
         debug!("Requesting info update from remote server");
-        self.socket.send(item.as_ref())?;
+        let mut buf = [0u8; 1024];
+        let bytes_written = item.serialize(&mut buf)?;
+        let packet = &buf[0..bytes_written];
+        self.socket.send(packet)?;
 
-        let mut buf = [0; 1024];
-        let bytes_read = self.socket.recv(&mut buf)?;
-        let received_buf = (&buf[0..bytes_read]).to_owned();
+        if log_enabled!(Level::Trace) {
+            trace!(
+                "Sending to remote server: {:?}",
+                Bytes::copy_from_slice(packet)
+            );
+        }
+
+        let bytes_written = self.socket.recv(&mut return_buf)?;
 
         if log_enabled!(Level::Trace) {
             trace!(
                 "From (remote server?) received: {:?}",
-                Bytes::from((&buf[0..bytes_read]).to_owned())
+                Bytes::copy_from_slice(&return_buf[0..bytes_written])
             );
         }
 
-        Ok(received_buf)
+        Ok(bytes_written)
     }
 }

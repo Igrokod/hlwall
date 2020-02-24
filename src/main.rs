@@ -17,7 +17,7 @@ struct Opt {
 
     /// Target server we cache queries from
     #[structopt(name = "TARGET_SERVER", default_value = "127.0.0.1:27015")]
-    target: String
+    target: String,
 }
 
 fn main() -> anyhow::Result<()> {
