@@ -59,8 +59,7 @@ impl ListenServer {
 
             if log_enabled!(Level::Trace) {
                 trace!(
-                    "Sending {:?} response to {}, contents: {:?}",
-                    packet,
+                    "Sending response to {}, contents: {:?}",
                     client_addr,
                     Bytes::copy_from_slice(packet)
                 )
