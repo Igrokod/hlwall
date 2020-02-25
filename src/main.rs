@@ -21,6 +21,7 @@ struct Opt {
 }
 
 fn main() -> anyhow::Result<()> {
+    better_panic::install();
     env_logger::init();
 
     let config = Opt::from_args();
