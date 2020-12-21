@@ -19,7 +19,7 @@ pub enum PacketParseError {
     MailformedPacket,
     #[error("Unsupported packet split status ({0:x}). Only single packets are supported")]
     UnsupportedSplitStatus(i32),
-    #[error("Unsupported packet type: {0:x}")]
+    #[error("Unsupported packet type: {0:X}")]
     UnsupportedPacketType(u8),
 }
 
